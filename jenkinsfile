@@ -1,0 +1,28 @@
+pipeline {
+  agent any
+  environment {
+    DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+  }
+  stages {
+    stage('Build') {
+      steps {
+        sh 'docker build -t prudhvi9999/jenkins_image:${BUILD_ID} .'
+      }
+    }
+    stage('Login') {
+      steps {
+        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+      }
+    }
+    stage('Push') {
+      steps {
+        sh 'docker push prudhvi9999/jenkins_image:${BUILD_ID}'
+      }
+    }
+  }
+  post {
+    always {
+      sh 'docker logout'
+    }
+  }
+}
